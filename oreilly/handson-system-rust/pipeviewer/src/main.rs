@@ -3,9 +3,21 @@ use std::io::{self, Read, Write};
 const CHUNK_SIZE: usize = 16 * 1024;
 
 fn main() {
-    let mut buffer = [0; CHUNK_SIZE];
+    let mut total_bytes = 0;
 
-    let num_read = io::stdin().read(&mut buffer).unwrap();
-    eprintln!("num_read: {}", num_read);
-    io::stdout().write_all(&buffer[..num_read]).unwrap();
+    loop {
+        let mut buffer = [0; CHUNK_SIZE];
+
+        let num_read = match io::stdin().read(&mut buffer) {
+            Ok(0) => break,
+            Ok(x) => {
+                total_bytes += x;
+                x
+            }
+            Err(_) => break,
+        };
+        io::stdout().write_all(&buffer[..num_read]).unwrap();
+    }
+
+    eprintln!("total_bytes: {}", total_bytes);
 }
