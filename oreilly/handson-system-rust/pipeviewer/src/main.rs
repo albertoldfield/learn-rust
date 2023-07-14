@@ -1,9 +1,14 @@
-use std::io::{self, Read, Write};
+use std::{
+    env,
+    io::{self, Read, Write},
+};
 
 const CHUNK_SIZE: usize = 16 * 1024;
 
 fn main() {
     let mut total_bytes = 0;
+
+    let silent = env::var("PV_SILENT").unwrap_or(String::new()).len() > 0;
 
     loop {
         let mut buffer = [0; CHUNK_SIZE];
@@ -16,8 +21,11 @@ fn main() {
             }
             Err(_) => break,
         };
+
         io::stdout().write_all(&buffer[..num_read]).unwrap();
     }
 
-    eprintln!("total_bytes: {}", total_bytes);
+    if !silent {
+        eprintln!("total_bytes: {}", total_bytes);
+    }
 }
